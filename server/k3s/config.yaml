@@ -1,0 +1,23 @@
+tls-san:
+  - "domain"
+# 使用 embedded etcd（單機）
+cluster-init: true
+# 停用 traefik
+disable:
+  - traefik
+write-kubeconfig-mode: "0644"
+# etcd snapshot
+etcd-snapshot-schedule-cron: "0 */12 * * *"
+etcd-snapshot-retention: 10
+etcd-expose-metrics: true
+# kubelet log rotation（Loki-heavy 必開）
+kubelet-arg:
+  - "container-log-max-size=10Mi"
+  - "container-log-max-files=5"
+  - "image-gc-high-threshold=80"
+  - "image-gc-low-threshold=65"
+# 降低 etcd 壓力
+kube-apiserver-arg:
+  - "event-ttl=1h"
+kube-controller-manager-arg:
+  - "terminated-pod-gc-threshold=50"

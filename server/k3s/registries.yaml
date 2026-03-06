@@ -1,0 +1,17 @@
+mirrors:
+  "asia-east1-docker.pkg.dev":
+    endpoint:
+      - "https://asia-east1-docker.pkg.dev"
+  "ghcr.io":
+    endpoint:
+      - "https://ghcr.io"
+
+configs:
+  "asia-east1-docker.pkg.dev":
+    auth:
+      username: _json_key
+      password: ''
+  "ghcr.io":
+    auth:
+      username: ''
+      password: ''

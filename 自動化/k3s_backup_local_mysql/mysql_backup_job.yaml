@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mysql-backup
+  namespace: mng-prod
+spec:
+  schedule: "0 3 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: backup
+            image: google/cloud-sdk:slim
+            env:
+            - name: MYSQL_HOST
+              value: "mysql"
+            - name: MYSQL_USER
+              value: "root"
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: password
+            volumeMounts:
+            - name: gcs-key
+              mountPath: /gcs
+            command:
+            - /bin/sh
+            - -c
+            - |
+              DATE=$(date +%Y%m%d_%H%M)
+              FILE="/tmp/mysql_${DATE}.sql.gz"
+
+              echo "Dumping..."
+              mysqldump -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD --all-databases \
+                | gzip > $FILE
+
+              echo "Auth GCS..."
+              gcloud auth activate-service-account --key-file=/gcs/key.json
+
+              echo "Uploading..."
+              gsutil cp $FILE gs://howgroup-mysql-backup/
+
+              echo "Done."
+          volumes:
+          - name: gcs-key
+            secret:
+              secretName: gcs-key
