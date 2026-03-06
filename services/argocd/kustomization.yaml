@@ -9,7 +9,7 @@ resources:
 ## changes to config maps
 patchesStrategicMerge:
   - argocd-cmd-params-cm-patch.yml
-  - argocd-notification-howgroup-pusher.yaml
+  - argocd-notification-pusher.yaml
   - argocd-application-controller.yaml
   - argocd-server.yaml
 
